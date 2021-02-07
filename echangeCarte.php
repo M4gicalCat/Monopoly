@@ -2,7 +2,7 @@
 include_once ('connexion.php');
 include_once ('fonctionsMonopoly.php');
 $title = "Monopoly";
-include_once ('../head.php');
+include_once ('head.php');
 
 if(empty($_POST) or !(isset($_POST['Achete'], $_POST['Vend']) && $_POST['Achete'] != $_POST['Vend'] && $_POST['Vend'] != "none" && $_POST['Achete'] != "none")):
 
@@ -90,7 +90,14 @@ if(empty($_POST) or !(isset($_POST['Achete'], $_POST['Vend']) && $_POST['Achete'
     }
     if(isset($_POST['Argent']) && $_POST['Argent']!= NULL)
     {
+        if(getArgentFromidJoueur(getIdJoueurFromNomJoueur($_POST['Achete'])) > $_POST['Argent']):
         transaction($_POST['Achete'], $_POST['Vend'], $_POST['Argent']);
+        else:
+            $_SESSION['error'] = "Vous n'avez pas assez d'argent";
+            header('Location: error.php');
+            die();
+        endif;
+
     }
     foreach ($ruesJoueur1 as $rue)
     {
@@ -107,5 +114,5 @@ if(empty($_POST) or !(isset($_POST['Achete'], $_POST['Vend']) && $_POST['Achete'
 
 <?php
 endif;
-include_once ('../footer.php');
+include_once ('footer.php');
 ?>

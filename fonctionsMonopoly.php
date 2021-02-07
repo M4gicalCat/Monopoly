@@ -508,7 +508,6 @@ function transaction($donneur, $receveur, $montant)
     $prep -> bindParam(':receveur', $receveur);
     $prep -> execute();
     $prep -> closeCursor();
-    echo "Transaction effectuée !";
 }
 
 function getIdRueFromNomRue($nomRue)
@@ -1565,4 +1564,55 @@ function getAllPlayersNames()
         }
     }
     return $noms;
+}
+
+function getProprieteesFromIdJoueur($idJoueur):array
+{
+    global $bdd;
+    $SQL_query = "SELECT nomRue FROM Rues WHERE id_possesseur = :idJoueur ORDER BY idCouleur ASC;";
+    $prep = $bdd -> prepare($SQL_query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $prep -> bindParam(':idJoueur', $idJoueur);
+    $prep ->  execute();
+    $result = $prep -> fetchAll();
+    $prep -> closeCursor();
+    $rues = array();
+    foreach ($result as $row)
+    {
+        foreach ($row as $nomRue)
+        {
+            array_push($rues, $nomRue);
+        }
+    }
+    return $rues;
+}
+
+function getALlRues():array
+{
+    global $bdd;
+    $SQL_query = "SELECT nomRue FROM Rues;";
+    $prep = $bdd -> prepare($SQL_query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $prep -> execute();
+    $result = $prep -> fetchAll();
+    $rues = array();
+    foreach ($result as $row)
+    {
+        foreach ($row as $rue)
+        {
+            array_push($rues, $rue);
+        }
+    }
+    return $rues;
+}
+
+function donneRue($idRue, $idActuel, $idFutur)
+{
+    global $bdd;
+    $SQL_query = "UPDATE Rues SET id_possesseur = :futur WHERE id_possesseur = :actuel AND idRue = :idRue ;";
+    $prep = $bdd -> prepare($SQL_query);
+    $prep -> bindParam(':futur', $idFutur);
+    $prep -> bindParam(':actuel', $idActuel);
+    $prep -> bindParam(':idRue', $idRue);
+    $prep -> execute();
+    $prep -> closeCursor();
+
 }

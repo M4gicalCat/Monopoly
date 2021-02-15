@@ -1,11 +1,37 @@
-<style>
     .Milieu
     {
         color: black;
     }
     th,td
     {
-        border: solid 1px;
+        border-radius: 25px;
+        border: solid black 3px;
+        background-color: white;
+    }
+    tr
+    {
+        border-radius: 25px;
+        border: solid black 3px;
+        min-height: 50%;
+    }
+    .Milieu
+    {
+        border: none;
+        align-content: center;
+        align-items: center;
+        text-align: center;
+        vertical-align: top;
+    }
+    .carteMaison
+    {
+        margin: 2%;
+        padding-top: 2%;
+    }
+    .monopoly
+    {
+        border-radius: 25px;
+        background-color: black;
+        border-spacing: 1px;
     }
     .pion
     {
@@ -59,7 +85,6 @@
         background-color: #08209B;
         color: #FFFFFF;
     }
-
     .buyMaison
     {
         display: inline-block;
@@ -69,6 +94,3 @@
     {
         border: 1px #1a1e21;
     }
-
-
-</style>

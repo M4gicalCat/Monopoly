@@ -1,6 +1,6 @@
 <?php
 $title = "Monopoly";
-$style = "Monopoly.css";
+$style = "monopoly.css";
 include('../head.php');
 ?>
 <form method="post" action="Monopoly.php">

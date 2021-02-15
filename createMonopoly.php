@@ -41,6 +41,7 @@ for($i=1 ; $i <= $nbJoueurs ; $i++)
 ================================================================*/
 if(empty($_GET))
 {
+    unset($_SESSION['prison']);
     if((getCarteCaisseComTiree(getLastPlayer()) || getCarteChanceTiree(getLastPlayer())) && !isOnChance(getLastPlayer()) && !isOnCaisseCom(getLastPlayer()))
     {
         resetCarteTiree();
@@ -105,9 +106,10 @@ if(isset($_GET['Tours']) && $_GET['Tours'] != NULL)
     changePlaceFromidJoueur($place, $idJoueur);                               //On lui affecte sa nouvelle place dans la BDD
 
     changePrison(getLastPlayer());                                            //Si le joueur  est en prison, on lui retire un tour à y passer
-    if(getPlaceFromidJoueur(getLastPlayer()) == 30)    //Si le joueur tombe sur 'Allez en prison' :
+    if(getPlaceFromidJoueur(getLastPlayer()) == 30)                           //Si le joueur tombe sur 'Allez en prison' :
     {
         putInJail(getLastPlayer());                                           //On le met en prison
+        $_SESSION['prison'] = "Allez en prison";
     }
     if(getNbDouble(getLastPlayer())>=3)
     {
@@ -127,6 +129,7 @@ if(isset($_GET['Tours']) && $_GET['Tours'] != NULL)
 if(isset($_GET['demande']) && $_GET['demande']!=NULL)
 {
     $joueurAchete = getLastPlayer();                                                        //Récupération de l'id du Joueur actuel
+    echo "<div style='display: none;' id='getLastPlayer'>".$joueurAchete."</div>";
     $placeAchete = getPlaceFromidJoueur($joueurAchete, );                                   //Ainsi que de sa place
     if($placeAchete == 0){$placeAchete = 40;}                                               //S'il est sur le départ, il faut mettre sa place à 40 pour la BDD
 
@@ -198,14 +201,7 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
     $placeDonne = getPlaceFromidJoueur($joueurDonne);
     $joueurRecoit = getProprietaire($placeDonne);
 
-    if($placeDonne == 12 || $placeDonne == 28)
-    {
-        $argentTransaction = (getDesFromidDes(1)+ getDesFromidDes(2)) * 4;
-    }
-    else
-    {
-        $argentTransaction = getLoyer($placeDonne, getProprietaire($placeDonne));
-    }
+    $argentTransaction = getLoyer($placeDonne, getProprietaire($placeDonne));
     header( "refresh:5;url=Monopoly.php" );
 }
 
@@ -219,12 +215,12 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
 =======                                                    =======
 ==================================================================
 -->
-<table>
+<table class="monopoly">
     <tbody>
-    <tr>
+    <tr style="background-color: black;">
         <th class="cote">Parc gratuit <?php echo "<br>Valeur : ".getArgentParcGratuit()." €"; foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 20); } ?></th> <!-- case en haut à gauche : Parc gratuit -->
-        <td>
-            <table>
+        <td style="background-color: black;">
+            <table class="monopoly">
                 <tbody>
                 <tr>
                     <th class="rouge"><?php afficheMaison(21); afficheHotel(21); ?>Avenue Matignon (€<?php echo getPrixRue(21); ?>) <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 21); } ?></th>
@@ -243,8 +239,8 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
         <th class="cote">Allez en Prison <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 30); } ?></th><!-- case en haut à droite : Allez en prison -->
     </tr>
     <tr>
-        <td>
-            <table>
+        <td style="background-color: black;">
+            <table class="monopoly">
                 <tbody>
                 <tr>
                     <th class="orange"><?php afficheMaison(19);  afficheHotel(19);?>Place Pigalle (€<?php echo getPrixRue(19); ?>) <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 19); } ?></th>
@@ -278,6 +274,10 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
         </td>
         <td class="Milieu">
 <?php
+            if(isset($_SESSION['prison']))
+            {
+                echo "<div style='border-radius: 20px;margin: 1px 2px; background-color: #FF000080; padding:1em 0; text-align: center;' id='vousEtesEnPrison'><div>".$_SESSION['prison']."</div><button onclick='remove(`vousEtesEnPrison`)'>X</button></div>";
+            }
             afficheCarte(getPlaceFromidJoueur(getLastPlayer()));
             $de1 = getDesFromidDes(1);                                                          //Récupération de la valeur du dé n°1
             $de2 = getDesFromidDes(2);                                                          //Récupération de la valeur du dé n°2
@@ -294,23 +294,43 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
                 for ($i = 0; $i < sizeof($couleursPareilles); $i++)                             //Pour toutes les couleurs complètes :
                 {
                     if(getPrixMaison(getNomRueFromidCouleur($couleursPareilles[$i])) < getArgentFromidJoueur(getLastPlayer())):
-                    echo "<br><a href='Monopoly.php?Maison=" . $couleursPareilles[$i] .
-                        "'><button>Maison de couleur ".$couleursPareilles[$i]."</button></a><br>";     //On propose d'acheter une maison pour une des rues
+
+                        $rues = getRuesFromCouleur($couleursPareilles[$i]);
+                        $maisons = false;
+                        foreach ($rues as $rue)
+                        {
+                            if(getNbMaison($rue) != 4)
+                            {
+                                $maisons = true;
+                            }
+                        }
+                        if($maisons)
+                        {
+                            echo "<br><a href='Monopoly.php?Maison=" . $couleursPareilles[$i] .
+                                "'><button>Maison de couleur " . $couleursPareilles[$i] . "</button></a><br>";     //On propose d'acheter une maison pour une des rues
+                        }
                     endif;
                     $ruesPareilles = getRuesFromCouleur($couleursPareilles[$i]);
+                    $hotelDispo = true;
                     foreach ($ruesPareilles as $rue)
                     {
-                        if (getNbMaison($rue) == 4)
+                        if(getNbMaison($rue) != 4 && getNbHotels($rue) != 1)
                         {
-                            echo "Vous possédez toutes les maisons ici : ".$rue.". Voulez vous y acheter un hôtel ?";
-                            echo "<br><a href='Monopoly.php?acheteHotel=".$rue."'><button>Hôtel</button></a>";
+                            $hotelDispo = false;
+                        }
+                    }
+                    foreach ($ruesPareilles as $rue)
+                    {
+                        if (getNbMaison($rue) == 4 && $hotelDispo && getNbHotels($rue) != 1)
+                        {
+                            echo "<br><a href='Monopoly.php?acheteHotel=".$rue."'><button>Hôtel : ".$rue."</button></a><br>";
                         }
                     }
                 }
 
                 if(getArgentFromidJoueur(getLastPlayer()) < 0)
                 {
-                    echo "<script>alert('".getNomJoueurFromidJoueur(getLastPlayer())." passe en négatif !');</script>";
+                    //echo "<script>alert('".getNomJoueurFromidJoueur(getLastPlayer())." passe en négatif !');</script>";
                 }
 
                 if($de1 == $de2)                                                                    //Si le joueur a fait un double
@@ -488,8 +508,8 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
 
 ?>
         </td>
-        <td>
-            <table>
+        <td style="background-color: black;">
+            <table class="monopoly">
                 <tbody>
                 <tr>
                     <th class="vert"><?php afficheMaison(31);  afficheHotel(31);?>Avenue de Breteuil (€<?php echo getPrixRue(31); ?>) <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 31); } ?></th>
@@ -524,8 +544,8 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
     </tr>
     <tr>
         <th class="cote">Prison <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 10); } ?></th> <!-- case en bas à gauche : prison -->
-        <td>                    <!-- ===================== 9 cases du bas ============================= -->
-            <table>
+        <td style="background-color: black;">                    <!-- ===================== 9 cases du bas ============================= -->
+            <table class="monopoly">
                 <tbody>
                 <tr>
                     <th class="bleu"><?php afficheMaison(9); afficheHotel(9); ?>Avenue de la République (€<?php echo getPrixRue(9); ?>) <?php foreach ($infos as $joueur => $donnees){ estIci($joueur, $donnees['placeJoueur'], 9); } ?></th>
@@ -550,7 +570,7 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
     foreach ($infos as $donnees)
     {
         echo "<td><div style='display:inline-block; margin-top: 0; margin-right: 3%;'>";
-        echo "<img src='".($donnees['idJoueur']-1).".png' style='width: 4em; height: 4em;'>";
+        echo "<img src='".($donnees['idJoueur']-1).".png' style='margin:4px 10px; width: 4em; height: 4em;'>";
         echo "<div class='donneesJoueurs'>".$donnees['nomJoueur']." : ".$donnees['argentJoueur']." €</div>";
         if(isInJail($donnees['idJoueur'])!=NULL) {
             echo "<li>En prison pour " . isInJail($donnees['idJoueur']) . " tours.</li>";
@@ -562,18 +582,16 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
     }
     ?>
 </table>
-<table>
-    <tbody>
-        <?php
-            $ruesLibres = getRuesLibres();
-            foreach ($ruesLibres as $rue)
-            {
-                echo "<tr><th>".$rue."</th></tr>";
-            }
-            if(empty(getRuesLibres()))
-            {
-                echo "<a href='echangeCarte.php'><button>Échanger des cartes</button></a>";
-            }
+<?php
+    $ruesLibres = getRuesLibres();
+    echo "<select><option>Rues libres</option>";
+    foreach ($ruesLibres as $rue)
+    {
+        echo "<option>".$rue."</option>";
+    }
+    echo "</select>";
+    if(empty(getRuesLibres()))
+        {
+            echo "<a href='echangeCarte.php'><button>Échanger des cartes</button></a>";
+        }
         ?>
-    </tbody>
-</table>

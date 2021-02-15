@@ -17,6 +17,7 @@ idRue INT AUTO_INCREMENT
 ,idCouleur VARCHAR(10)
 ,nbMaisons INT(1)
 ,nbHotel INT(1)
+,couleurRue VARCHAR(6)
 , PRIMARY KEY (idRue)
 );";
 
@@ -94,6 +95,18 @@ $SQL_query = "UPDATE Rues SET id_possesseur = 999 WHERE nomRue = 'CAISSE DE COMM
                   UPDATE Rues SET idCouleur = 'vert' WHERE idRue = 31; UPDATE Rues SET idCouleur = 'vert' WHERE idRue = 32; UPDATE Rues SET idCouleur = 'vert' WHERE idRue = 34;
                   UPDATE Rues SET idCouleur = 'bleu foncé' WHERE idRue = 37; UPDATE Rues SET idCouleur = 'bleu foncé' WHERE idRue = 39;
                   UPDATE Rues SET idCouleur = 'gare' WHERE idRue = 5; UPDATE Rues SET idCouleur = 'gare' WHERE idRue = 15; UPDATE Rues SET idCouleur = 'gare' WHERE idRue = 25; UPDATE Rues SET idCouleur = 'gare' WHERE idRue = 35;";
+    $prep = $bdd -> prepare($SQL_query);
+    $prep ->  execute();
+    $prep ->closeCursor();
+
+        $SQL_query = "UPDATE Rues SET couleurRue = 'CC33CC' WHERE idRue = 1 OR idRue = 3;
+                  UPDATE Rues SET couleurRue = '1ab3fe' WHERE idRue = 6 OR idRue = 8 OR idRue = 9;
+                  UPDATE Rues SET couleurRue = '660099' WHERE idRue = 11 OR idRue = 13 OR idRue = 14;
+                  UPDATE Rues SET couleurRue = 'FF6633' WHERE idRue = 16 OR idRue = 18 OR idRue = 19;
+                  UPDATE Rues SET couleurRue = 'EE0000' WHERE idRue = 21 OR idRue = 23 OR idRue = 24;
+                  UPDATE Rues SET couleurRue = 'FFCC33' WHERE idRue = 26 OR idRue = 27 OR idRue = 29;
+                  UPDATE Rues SET couleurRue = '3F745A' WHERE idRue = 31 OR idRue = 32 OR idRue = 34;
+                  UPDATE Rues SET couleurRue = '08209B' WHERE idRue = 37 OR idRue = 39;";
     $prep = $bdd -> prepare($SQL_query);
     $prep ->  execute();
     $prep ->closeCursor();

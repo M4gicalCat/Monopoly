@@ -392,14 +392,15 @@ function getLoyer($idRue, $idJoueur)
                 $nbMaisons += 1;
             }
         }
+        $de1 = getDesFromidDes(1);
+        $de2 = getDesFromidDes(2);
+        echo $nbMaisons;
         if($nbMaisons == 2)
         {
-            global $de1, $de2;
             return (10 * ($de1 + $de2));
         }
         if($nbMaisons == 1)
         {
-            global $de1, $de2;
             return (4 * ($de1 + $de2));
         }
 
@@ -786,7 +787,7 @@ function tireCarteCaisseCom($idJoueur)
 function tireCarteChance($idJoueur)
 {
     global $bdd;
-    $numCarte = random_int(1,16);
+    $numCarte = 13;//random_int(1,16);
     switch ($numCarte)
     {
         case 1:
@@ -881,11 +882,18 @@ function tireCarteChance($idJoueur)
                     if(getHotelFromNomRue($nom) != NULL)
                     {
                         $hotels += getHotelFromNomRue($nom);
+                        $maisons -= 4;
                     }
                 }
             }
             $argent = getArgentFromidJoueur($idJoueur) - 40*$maisons - 115*$hotels;
             changeArgentFromidJoueur($argent, $idJoueur);
+            $argent = 40*$maisons + 115*$hotels;
+            $SQL_query = "UPDATE ParcGratuit SET argentParc = argentParc + :argent ;";
+            $prep = $bdd -> prepare($SQL_query);
+            $prep -> bindParam(':argent', $argent);
+            $prep -> execute();
+            $prep -> closeCursor();
             echo "Vous devez payer € ".(40*$maisons + 115*$hotels).".";
             break;
         case 7:
@@ -991,11 +999,18 @@ function tireCarteChance($idJoueur)
                     if(getHotelFromNomRue($nom) != NULL)
                     {
                         $hotels += getHotelFromNomRue($nom);
+                        $maisons -= 4;
                     }
                 }
             }
             $argent = getArgentFromidJoueur($idJoueur) - 25*$maisons - 100*$hotels;
             changeArgentFromidJoueur($argent, $idJoueur);
+            $argent = 25*$maisons + 100*$hotels;
+            $SQL_query = "UPDATE ParcGratuit SET argentParc = argentParc + :argent ;";
+            $prep = $bdd -> prepare($SQL_query);
+            $prep -> bindParam(':argent', $argent);
+            $prep -> execute();
+            $prep -> closeCursor();
             echo "Vous devez payer € ".(25*$maisons + 100*$hotels).".";
             break;
         case 14:
@@ -1205,7 +1220,7 @@ function payeParcGratuit($argent, $idJoueur)
 function getNomRueFromIdRue($id)
 {
     global $bdd;
-    $SQL_query = "SELECT nomRue FROM Rues WHERE idRue = ${id};";
+    $SQL_query = "SELECT nomRue FROM Rues WHERE idRue = '${id}';";
     $prep = $bdd -> prepare($SQL_query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
     $prep -> execute();
     $result = $prep -> fetchAll();
@@ -1339,7 +1354,7 @@ function ajouteHotel($nomRue, $idJoueur)
     $prep = $bdd -> prepare($SQL_query);
     $prep -> execute();
     $prep -> closeCursor();
-    echo "Hotel construit !<br><a href='Monopoly.php'><button>Continuer à jouer</button></a>";
+    echo "Hotel construit !<br><a href='Monopoly.php?demande=1'><button>Continuer à jouer</button></a>";
 }
 
 function getPrixHotel($nomRue)
@@ -1419,13 +1434,13 @@ function afficheCarte($idRue)
     $prep ->  closeCursor();
     foreach ($result as $row)
     {
-        echo "<div class='carteMaison'><table><tr><td>".$row['nomRue']."</td></tr>
-              <tr><td>1 maison : € ".$row['loyer1maison']."</td></tr>
-              <tr><td>2 maisons : € ".$row['loyer2maisons']."</td></tr>
-              <tr><td>3 maisons : € ".$row['loyer3maisons']."</td></tr>
-              <tr><td>4 maisons : € ".$row['loyer4maisons']."</td></tr>
-              <tr><td>1 Hôtel : € ".$row['loyerHotel']."</td></tr>
-              <tr><td>Prix : € ".$row['valeurRue']."</td></tr>
+        echo "<div style='margin-top: 0; align-self: center;' class='carteMaison'><table><tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>".$row['nomRue']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>1 maison : € ".$row['loyer1maison']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>2 maisons : € ".$row['loyer2maisons']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>3 maisons : € ".$row['loyer3maisons']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>4 maisons : € ".$row['loyer4maisons']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>1 Hôtel : € ".$row['loyerHotel']."</td></tr>
+              <tr><td style='background-color:#".getCouleurHexaFromIdRue($idRue)."50;'>Prix : € ".$row['valeurRue']."</td></tr>
               </table>";
     }
 }
@@ -1615,4 +1630,18 @@ function donneRue($idRue, $idActuel, $idFutur)
     $prep -> execute();
     $prep -> closeCursor();
 
+}
+
+function getCouleurHexaFromIdRue($idRue)
+{
+    global $bdd;
+    $SQL_query = "SELECT couleurRue FROM Rues WHERE idRue = ${idRue};";
+    $prep = $bdd -> prepare($SQL_query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $prep -> execute();
+    $result = $prep -> fetchAll();
+    $prep -> closeCursor();
+    foreach ($result as $row)
+    {
+        return $row['couleurRue'];
+    }
 }

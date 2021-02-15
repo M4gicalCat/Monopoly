@@ -88,16 +88,16 @@ if(empty($_POST) or !(isset($_POST['Achete'], $_POST['Vend']) && $_POST['Achete'
             }
         }
     }
-    if(isset($_POST['Argent']) && $_POST['Argent']!= NULL)
-    {
-        if(getArgentFromidJoueur(getIdJoueurFromNomJoueur($_POST['Achete'])) > $_POST['Argent']):
-        transaction($_POST['Achete'], $_POST['Vend'], $_POST['Argent']);
-        else:
-            $_SESSION['error'] = "Vous n'avez pas assez d'argent";
-            header('Location: error.php');
-            die();
-        endif;
-
+    if(isset($_POST['Argent']) && $_POST['Argent']!= NULL) {
+        if (getArgentFromidJoueur(getIdJoueurFromNomJoueur($_POST['Achete'])) > $_POST['Argent'])
+        {
+            transaction(getIdJoueurFromNomJoueur($_POST['Achete']), getIdJoueurFromNomJoueur($_POST['Vend']), $_POST['Argent']);
+        }
+        else
+        {
+        $_SESSION['error'] = "Vous n'avez pas assez d'argent";
+        header("Location: error.php");
+        }
     }
     foreach ($ruesJoueur1 as $rue)
     {

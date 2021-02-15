@@ -10,5 +10,8 @@ if(isset($_SESSION['error']))
     echo "<p style='background-color: red; padding: 3% 10%; font-size: 5em; border-radius:15px; text-align: center;'>".$_SESSION['error']."</p>";
     unset($_SESSION['error']);
 }
+else{
+    header('Location: Monopoly.php');
+}
 
 include_once ('footer.php');

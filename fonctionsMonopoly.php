@@ -295,7 +295,7 @@ function afficheProprietesFromIdJoueur($idJoueur)
     }
     foreach ($possessions as $rue)
     {
-        echo"<li>".$rue." : ".getLoyer(getIdRueFromNomRue($rue), $idJoueur)."€</li>";
+        echo"<li><p style='color: #".getCouleurHexaFromIdRue(getIdRueFromNomRue($rue))."'>".$rue." : ".getLoyer(getIdRueFromNomRue($rue), $idJoueur)."€</p></li>";
     }
 }
 

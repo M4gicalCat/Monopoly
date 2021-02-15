@@ -591,7 +591,7 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
     }
     echo "</select>";
     if(empty(getRuesLibres()))
-        {
-            echo "<a href='echangeCarte.php'><button>Échanger des cartes</button></a>";
-        }
-        ?>
+    {
+        echo "<a href='echangeCarte.php'><button>Échanger des cartes</button></a>";
+    }
+?>

@@ -53,7 +53,7 @@ if(empty($_POST) or !(isset($_POST['Achete'], $_POST['Vend']) && $_POST['Achete'
         echo "<td style='border: solid 1px;'>";
         foreach ($ruesJoueur as $rue)
         {
-            echo "<label>".$rue."</label><input type='checkbox' name='".$rue."'><br><br>";
+            echo "<label><span style='color: #".getCouleurHexaFromIdRue(getIdRueFromNomRue($rue)).";'>".$rue."</span></label><input type='checkbox' name='".$rue."'><br><br>";
         }
 
         if($numJoueur == 1){echo "<label>Rajouter de l'argent</label>";echo "<input type='number' name='Argent'>";}

@@ -320,6 +320,7 @@ function getLoyer($idRue, $idJoueur)
 
     if($idRue == 5 || $idRue == 15 || $idRue == 25 || $idRue == 35)
     {
+        $nbMaisons = 0;
         $SQL_query = "SELECT id_possesseur FROM Rues WHERE idRue = 5;";
         $prep = $bdd -> prepare($SQL_query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $prep -> execute();
@@ -364,7 +365,7 @@ function getLoyer($idRue, $idJoueur)
                 $nbMaisons += 1;
             }
         }
-
+        if($nbMaisons > 4){$nbMaisons=4;}
     }
 
     elseif ($idRue == 12 || $idRue == 28)
@@ -710,7 +711,8 @@ function tireCarteCaisseCom($idJoueur)
         case 7:
             echo 'Payez une amende de € 10 ou tirez une carte "CHANCE".';
             echo "<a href='Monopoly.php?tireCarteChance=1'><button>Tirer une carte chance</button></a><a href='Monopoly.php?paye10parc'><button>Payer € 10</button></a>";
-            break;
+            setCarteCaisseComTireeTrue($idJoueur);
+            return;
         case 8:
             echo "Allez en prison.<br>Avancez tout droit en prison.<br>Ne passez pas par la case Départ.<br>Ne recevez pas € 200.";
             putInJail($idJoueur, $bdd);
@@ -782,12 +784,14 @@ function tireCarteCaisseCom($idJoueur)
             break;
     }
     setCarteCaisseComTireeTrue($idJoueur);
+    echo "<br><a href='Monopoly.php'><button>Continuer le tour</button></a>";
+    return;
 }
 
 function tireCarteChance($idJoueur)
 {
     global $bdd;
-    $numCarte = 13;//random_int(1,16);
+    $numCarte = random_int(1,16);
     switch ($numCarte)
     {
         case 1:

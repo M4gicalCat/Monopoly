@@ -12,6 +12,7 @@ if(isset($_SESSION['error']))
 }
 else{
     header('Location: Monopoly.php');
+    
 }
 
 include_once ('footer.php');

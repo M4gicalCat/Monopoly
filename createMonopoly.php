@@ -278,6 +278,10 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
             {
                 echo "<div style='border-radius: 20px;margin: 1px 2px; background-color: #FF000080; padding:1em 0; text-align: center;' id='vousEtesEnPrison'><div>".$_SESSION['prison']."</div><button onclick='remove(`vousEtesEnPrison`)'>X</button></div>";
             }
+            if(getArgentFromidJoueur(getLastPlayer()) < 0 && isset($_GET['demande']))
+            {
+                echo "<div style='border-radius: 20px;margin: 1px 2px; background-color: #FF000080; padding:1em 0; text-align: center;' id='JoueurNegatif'><div>".getNomJoueurFromidJoueur(getLastPlayer())." est en négatif !</div><button onclick='remove(`JoueurNegatif`)'>X</button></div>";
+            }
             afficheCarte(getPlaceFromidJoueur(getLastPlayer()));
             $de1 = getDesFromidDes(1);                                                          //Récupération de la valeur du dé n°1
             $de2 = getDesFromidDes(2);                                                          //Récupération de la valeur du dé n°2
@@ -290,8 +294,8 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
 
             if(isset($_GET['demande']) && $_GET['demande']!=NULL)                                   //On demande si le joueur veut acheter une rue
             {
-                $couleursPareilles = verifCouleur(getLastPlayer());                             //On regarde quelles sont les couleurs où il possède toutes les rues
-                for ($i = 0; $i < sizeof($couleursPareilles); $i++)                             //Pour toutes les couleurs complètes :
+                $couleursPareilles = verifCouleur(getLastPlayer());                                 //On regarde quelles sont les couleurs où il possède toutes les rues
+                for ($i = 0; $i < sizeof($couleursPareilles); $i++)                                 //Pour toutes les couleurs complètes :
                 {
                     if(getPrixMaison(getNomRueFromidCouleur($couleursPareilles[$i])) < getArgentFromidJoueur(getLastPlayer())):
 
@@ -328,11 +332,6 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
                     }
                 }
 
-                if(getArgentFromidJoueur(getLastPlayer()) < 0)
-                {
-                    //echo "<script>alert('".getNomJoueurFromidJoueur(getLastPlayer())." passe en négatif !');</script>";
-                }
-
                 if($de1 == $de2)                                                                    //Si le joueur a fait un double
                 {
                     echo "<br>Double ! Vous pourrez rejouer !<br>";                                     //Il peut rejouer
@@ -343,7 +342,6 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
                     {
                         tireCarteCaisseCom(getLastPlayer());                                        //Il tire une carte Caisse de communauté
                     }
-                    echo "<br><a href='Monopoly.php'><button>Continuer le tour</button></a>";
                 }
 
                 elseif (isOnChance(getLastPlayer()))                                            //S'il est sur une case chance :
@@ -358,7 +356,7 @@ if(isset($_GET['payeJoueur']) && $_GET['payeJoueur']!=NULL)
 
                 elseif (getProprietaire($placeAchete) == NULL)                                          //Si la rue où le joueur se trouve n'a pas de propriétaire :
                 {
-                    if(getPrixRue($placeAchete) < getArgentFromidJoueur(getLastPlayer()))
+                    if(getPrixRue($placeAchete) <= getArgentFromidJoueur(getLastPlayer()))
                     {
                         echo "<br>Loyer nu : " . getLoyer($placeAchete, $joueurAchete) . " €";              //Affiche le loyer nu de la rue
                         echo "<br>" . getNomJoueurFromidJoueur($joueurAchete) .
